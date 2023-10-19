@@ -117,6 +117,22 @@ M.get_venvs = function(venvs_path)
     })
   end
 
+  -- PYENV
+  local pyenv_root = vim.fn.getenv('PYENV_ROOT')
+  if pyenv_root ~= vim.NIL then
+    local version_paths = scan_dir(pyenv_root .. '/versions', { depth = 1, only_dirs = true, silent = true })
+    for _, version_path in ipairs(version_paths) do
+      local env_paths = scan_dir(version_path .. '/envs', { depth = 1, only_dirs = true, silent = true })
+      for _, env_path in ipairs(env_paths) do
+        table.insert(venvs, {
+          name = Path:new(env_path):make_relative(version_path .. '/envs'),
+          path = env_path,
+          source = 'pyenv',
+        })
+      end
+    end
+  end
+
   return venvs
 end
 
